@@ -1,5 +1,5 @@
 ; Change to your own location
-(load "compiler.scm")
+(load "~/compilation/compiler.scm")
 
 
 (define testVSstaff
@@ -43,6 +43,13 @@
 ))		
 
 
+(define variableTests
+  (list
+    (cons 'abc `(var abc))
+    (cons '123x `(var 123x))  
+    (cons 'and 'failure)
+))
+
 (define constantTests
   (list
   
@@ -61,4 +68,5 @@
 (runAllTests
   (list
       (cons "Constants" constantTests)    
+      (cons "Variables" variableTests)       
 ))
