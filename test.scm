@@ -191,7 +191,7 @@
 
 (define beginTests
   (list
-    ;'(begin)
+    '(begin)
     '(begin 1)
     '(begin (or 1 2 3))
     '(begin (or 1 2) (if 1 2 3))
