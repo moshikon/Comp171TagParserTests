@@ -59,6 +59,7 @@
 (define condTests
   (list
      ;without sequences
+     `(cond)
      `(cond (x 1))
      `(cond (x 1) (c 12))
      `(cond (x 1) (b 2) (c 3))
@@ -71,6 +72,7 @@
 
 (define orTests
   (list
+    `(or)
     `(or 1)
     `(or 1 2)
     `(or 1 2 3)
@@ -81,6 +83,7 @@
 
 (define andTests
   (list
+    `(and)
     `(and 1)
     `(and 1 2)
     `(and 1 2 3 4)
@@ -99,14 +102,31 @@
     'AbC1gfj5j959b949jm5b9gk5kg
     'let2*
     'set-bang!
-    ;'and
+))
+
+(define letTests
+  (list
+    '(let () body)
+    '(let ((x 1)) body)
+    '(let ((x 1) (y 21)) body)
+    '(let ((x 1) (y 21) (abcde fghijKlmnOP123)) body (if (> x 5) 4 3) #t)
+    
+    '(let* () body)
+    '(let* ((x 1) (y 21)) body)
+    '(let* ((x 1) (x abv)) body)
+    '(let* ((x 1) (y 21) (abcde fghijKlmnOP123)) body (if (> x 5) 4 3) #t)
+    
+    '(letrec () body)
+    '(letrec ((x 1)) b)
+    '(letrec ((x 1) (y 2)) b1 b2)
+    '(letrec ((x 1) (y 2) (a 5)) b1 b2 (or 1 2 3) (if 1 2 3) #t)
 ))
 
 (define constantTests
   (list
-  
-    ;'()   
-    ;(list->vector (list 1 (list 2 3 4) 2 3))  
+    ''()   
+    ''#(2)
+    ''#(1 (2 3 4) 2 3)
     #f
     #\a  
     34
@@ -120,6 +140,7 @@
 (define lambdaTests
   (list
     ; lambda-simple
+    '(lambda () body)
     '(lambda (x) a)
     '(lambda (exp rest) (if a 1 "abc"))
     '(lambda (a b c d e f Symbol1) E1 E2 E3 E4 (f1 a))
@@ -155,7 +176,26 @@
   (list
     '(a)
     '(a b c)
-    '((a b) (a c))
+    '((a b) (a c) (a d))
+))
+
+(define quasiquoteTests
+  (list
+    `(quasiquote (a b c))
+    `(quasiquote (a ,b c))
+    `(quasiquote (a ,b ,@c))    
+    `(quasiquote (,@a ,b c))
+    `(quasiquote (,@a ,@b ,@c))    
+    `(quasiquote (,a ,b ,c))    
+))
+
+(define beginTests
+  (list
+    ;'(begin)
+    '(begin 1)
+    '(begin (or 1 2 3))
+    '(begin (or 1 2) (if 1 2 3))
+    
 ))
 
 (runAllTests
@@ -167,6 +207,9 @@
       (cons "Cond" condTests)      
       (cons "Constants" constantTests)    
       (cons "Variables" variableTests)     
-      (cons "Define" defineTests)    
-      (cons "Application" applicationTests)         
+      (cons "Define" defineTests)  
+      (cons "Let" letTests)   
+      (cons "Begin" beginTests)        
+      (cons "Application" applicationTests)    
+      (cons "QuasiQuote" quasiquoteTests)        
 ))
