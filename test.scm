@@ -5,10 +5,15 @@
 (define my-parse-func parse-2)
 (define staff-parse-func parse)
 
+(define try-catch
+  (lambda (try-thunk catch-thunk)
+    (guard (c (else (catch-thunk)))
+     (try-thunk))))
+
 (define testVSstaff
 	(lambda (input)
-		(let ((my-res (my-parse-func input))
-		      (staff-res (staff-parse-func input)))
+		(let* ((my-res (try-catch (lambda () (my-parse-func input)) (lambda () (format "ERROR"))))
+		      (staff-res (try-catch (lambda () (staff-parse-func input)) (lambda () (format "ERROR")))))
 			(display input)
 			(display ": ")			
 			(cond ((equal? my-res staff-res)
@@ -68,6 +73,8 @@
      `(cond (x 1 2))
      `(cond (x 1 2 abc) (c 12))
      `(cond (x 1 2 abc1) (b #f) (c (or 1 2) #t))
+     `(cond (x 1 2 abc1) (b #f) (c (or 1 2) #t) (else #f))
+     `(cond (x 1 2 abc1) (b #f) (c (or 1 2) #t) (else 112))
 ))
 
 (define orTests
@@ -134,7 +141,6 @@
     '(quote a)
     '(quote (a b c))
     '(quote (quote a b c))
-
 ))
 
 (define lambdaTests
@@ -147,6 +153,7 @@
     '(lambda (exp rest) (or a b c) (if a 1 "abc"))
     '(lambda (a b c d e arg154) (if a 1 "abc"))
     '(lambda () (or 1))
+    '(lambda (Sym1 Symbol2 Symbol1234567890) (display "Akuna Matata"))
     
     ;lambda-opt
     '(lambda (x y . z) a)
@@ -203,6 +210,57 @@
     '(set! v (f x))
 ))
 
+(define parserTests
+  '(4 
+	-3 
+	#t 
+	#f 
+	#\a 
+	#\A 
+	#\space 
+	#\tab
+	'3 
+	3 
+	'"abc" 
+	"abc" 
+	'#\a 
+	#\a 
+	''a 
+	''''''a
+	'abc 
+	abc 
+	'#(a b c) 
+	'#() 
+	'#(() 
+	(#()))
+	(a b c)
+	(if (zero? n) 1 (* n (fact (- n 1))))
+	(cond ((foo? x) foo-x)
+		((goo? x) goo-x)
+		((boo? x) boo-x)
+		(else poo-x))
+	(begin e1)
+	(begin e1 e2 e3)
+	(lambda a b c)
+	(lambda a b)
+	(lambda (a b . c) (list a b c))
+	(lambda (a b c) (list a b c))
+	(let ((a 1) (b 2) (c 3))
+	  (+ a b c))
+	(let* ((a 1)
+		   (a (+ a 1))
+		   (a (+ a a))
+		   (a (* a a)))
+	  (set-car! x a)
+	  a)
+	(define a 3)
+	(define a (lambda (x) x))
+	(define (fact n) (if (zero? n) 1 (* n (fact (- n 1)))))
+	(define (foo a b . c) (list a b c))
+	(define (foo . a) (list a))
+	(define (foo a b c) (list a b c))
+))
+
 (runAllTests
   (list
       (cons "Lambda" lambdaTests)     
@@ -217,5 +275,6 @@
       (cons "Begin" beginTests)  
       (cons "Set" setTests) 
       (cons "Application" applicationTests)    
-      (cons "QuasiQuote" quasiquoteTests)        
+      (cons "QuasiQuote" quasiquoteTests) 
+      (cons "Parser" parserTests)
 ))
