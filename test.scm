@@ -194,8 +194,13 @@
     '(begin)
     '(begin 1)
     '(begin (or 1 2 3))
-    '(begin (or 1 2) (if 1 2 3))
-    
+    '(begin (or 1 2) (if 1 2 3))    
+))
+
+(define setTests
+  (list
+    '(set! x 3)
+    '(set! v (f x))
 ))
 
 (runAllTests
@@ -209,7 +214,8 @@
       (cons "Variables" variableTests)     
       (cons "Define" defineTests)  
       (cons "Let" letTests)   
-      (cons "Begin" beginTests)        
+      (cons "Begin" beginTests)  
+      (cons "Set" setTests) 
       (cons "Application" applicationTests)    
       (cons "QuasiQuote" quasiquoteTests)        
 ))
