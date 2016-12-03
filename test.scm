@@ -15,6 +15,7 @@
 		(let* ((my-res (try-catch (lambda () (my-parse-func input)) (lambda () "ERROR")))
 		      (staff-res (try-catch (lambda () (staff-parse-func input)) (lambda () "ERROR"))))
 			(display (format "~s:" input))
+			;(display my-res)
 			(cond ((equal? my-res staff-res)
 				(display (format "\033[1;32m Success! ☺ \033[0m \n")) #t)
 				(else 
@@ -262,6 +263,7 @@
     '(cond)  
     '(lambda (a b c a) (f x))
     '(let ((AbC 5) (Sym123 "abc") (AbC 12)) (if (= AbC 12) #t (begin (display "WOW") #f)))
+    '(letrec ((AbC (lambda (x) (AbC x))) (Sym123 "abc") (AbC 12)) (if (= AbC 12) #t (begin (display "WOW") #f)))
 ))
 
 (runAllTests
