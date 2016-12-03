@@ -12,19 +12,13 @@
 
 (define testVSstaff
 	(lambda (input)
-		(let* ((my-res (try-catch (lambda () (my-parse-func input)) (lambda () (format "ERROR"))))
-		      (staff-res (try-catch (lambda () (staff-parse-func input)) (lambda () (format "ERROR")))))
-			(display input)
-			(display ": ")			
+		(let* ((my-res (try-catch (lambda () (my-parse-func input)) (lambda () "ERROR")))
+		      (staff-res (try-catch (lambda () (staff-parse-func input)) (lambda () "ERROR"))))
+			(display (format "~s:" input))
 			(cond ((equal? my-res staff-res)
-				(display "\033[1;32mSuccess! ☺ \033[0m ") (newline) #t)
-				(else (display "\033[1;31mFailed! ☹\033[0m ") 
-					(display ", expected: ")					
-					(display staff-res)
-					(display ", actual:")
-					(display my-res)
-					(newline)
-					#f))
+				(display (format "\033[1;32m Success! ☺ \033[0m \n")) #t)
+				(else 
+				(display (format "\033[1;31m Failed! ☹\033[0m , Expected: ~s, Actual: ~s \n" staff-res my-res)) #f))
 			)))
 			
 (define runTests
@@ -37,9 +31,10 @@
 	(newline)
 	(let ((results (map testVSstaff lst)))
 	(newline)
-	(cond ((andmap (lambda (exp) (equal? exp #t)) results)		
-		(display "\033[1;32m") (display tests-name) (display " Tests: SUCCESS! ☺ \033[0m\n") (newline) #t)
-		(else (display "\033[1;31m") (display tests-name) (display " Tests: FAILED! ☹ \033[0m\n") (newline) #f)))
+	(cond ((andmap (lambda (exp) (equal? exp #t)) results)	
+		(display (format "\033[1;32m~s Tests: SUCCESS! ☺ \033[0m\n \n" tests-name)) #t)		
+		(else
+		(display (format "\033[1;31m~s Tests: FAILED! ☹ \033[0m\n \n" tests-name)) #f)))
 ))
 
 (define runAllTests
@@ -63,8 +58,7 @@
 
 (define condTests
   (list
-     ;without sequences
-     `(cond)
+     ;without sequences     
      `(cond (x 1))
      `(cond (x 1) (c 12))
      `(cond (x 1) (b 2) (c 3))
@@ -75,6 +69,7 @@
      `(cond (x 1 2 abc1) (b #f) (c (or 1 2) #t))
      `(cond (x 1 2 abc1) (b #f) (c (or 1 2) #t) (else #f))
      `(cond (x 1 2 abc1) (b #f) (c (or 1 2) #t) (else 112))
+     `(cond (x 1 2 abc1) (b #f) (c (or 1 2) #t) (else (display "I'm in Else") (f a b c)))
 ))
 
 (define orTests
@@ -153,7 +148,7 @@
     '(lambda (exp rest) (or a b c) (if a 1 "abc"))
     '(lambda (a b c d e arg154) (if a 1 "abc"))
     '(lambda () (or 1))
-    '(lambda (Sym1 Symbol2 Symbol1234567890) (display "Akuna Matata"))
+    '(lambda (Sym1 Symbol2 Symbol1234567890) (display "Akuna Matata"))       
     
     ;lambda-opt
     '(lambda (x y . z) a)
@@ -193,7 +188,8 @@
     `(quasiquote (a ,b ,@c))    
     `(quasiquote (,@a ,b c))
     `(quasiquote (,@a ,@b ,@c))    
-    `(quasiquote (,a ,b ,c))    
+    `(quasiquote (,a ,b ,c))  
+    `(quasiquote (,a ,((f a) x) ,c))  
 ))
 
 (define beginTests
@@ -261,6 +257,13 @@
 	(define (foo a b c) (list a b c))
 ))
 
+(define negativeTests
+  (list
+    '(cond)  
+    '(lambda (a b c a) (f x))
+    '(let ((AbC 5) (Sym123 "abc") (AbC 12)) (if (= AbC 12) #t (begin (display "WOW") #f)))
+))
+
 (runAllTests
   (list
       (cons "Lambda" lambdaTests)     
@@ -277,4 +280,5 @@
       (cons "Application" applicationTests)    
       (cons "QuasiQuote" quasiquoteTests) 
       (cons "Parser" parserTests)
+      (cons "Negative" negativeTests)
 ))
