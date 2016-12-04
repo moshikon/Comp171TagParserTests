@@ -13,7 +13,7 @@
 (define testVSstaff
 	(lambda (input)
 		(let* ((my-res (try-catch (lambda () (my-parse-func input)) (lambda () "ERROR")))
-		      (staff-res (try-catch (lambda () (staff-parse-func input)) (lambda () "ERROR"))))
+		      (staff-res (try-catch (lambda () (staff-parse-func input)) (lambda () (display "\033[1;34m !!Negative Test!! \033[0m ") "ERROR"))))
 			(display (format "~s:" input))
 			;(display my-res)
 			(cond ((equal? my-res staff-res)
@@ -167,11 +167,14 @@
     ;regular-define
     '(define x 5)
     '(define x (lambda (x) x))
+    '(define a b c d)
+    '(define a (b c d))
     
     ;mit-style-define
     '(define (id x) x)
+    '(define (id x) x y)
     '(define (foo x y z) (if x y z))
-    '(define (foo x y . z) (if x y z))
+    '(define (foo x y . z) (if x y z) #t)
     '(define (list . args) args)
 ))
 
@@ -180,6 +183,7 @@
     '(a)
     '(a b c)
     '((a b) (a c) (a d))
+    '((lambda (x y z . e) (e (f x y z123))))
 ))
 
 (define quasiquoteTests
@@ -198,7 +202,13 @@
     '(begin)
     '(begin 1)
     '(begin (or 1 2 3))
-    '(begin (or 1 2) (if 1 2 3))    
+    '(begin (or 1 2) (if 1 2 3))   
+    '(begin (begin a b) a)
+    '(begin (begin a (begin c (begin d e f g))) a (a b c))
+    '(begin (begin a b c) (begin d e f) (begin e f) g)
+    '(begin (begin a c) b (begin d) g (begin e f) (or 1 2 3))
+    '(begin (if (if 1 2 3) (and 2 "a" #f) #t) (begin d e) (lambda args a b c) (begin e f) (or 1 2 3))
+    '(begin a (begin b (begin c (begin d e (begin f g h) "Akuna Matata"))))
 ))
 
 (define setTests
@@ -260,6 +270,7 @@
 
 (define negativeTests
   (list
+    '(if)
     '(cond)  
     '(lambda (a b c a) (f x))
     '(let ((AbC 5) (Sym123 "abc") (AbC 12)) (if (= AbC 12) #t (begin (display "WOW") #f)))
