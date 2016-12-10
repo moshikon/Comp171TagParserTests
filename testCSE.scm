@@ -40,15 +40,15 @@
 
 (define testVSstaff
 	(lambda (input)
+		(begin (display input)
 		(let* ((my-res (begin (gensym-count 0) (replace-gensym (my-parse-func input))))
-		      (staff-res (begin (gensym-count 0) (replace-gensym (staff-parse-func input)))))
-			(display (format "~s" input))
+		      (staff-res (begin (gensym-count 0) (replace-gensym (staff-parse-func input)))))			
 			;(display (format "\n => ~s\n" my-res))
 			(cond ((or (equal? staff-res  my-res) (verify-equality input staff-res my-res))
 				(display (format "\033[1;32m Success! ☺ \033[0m \n")) #t)
 				(else 
 				(display (format "\033[1;31m Failed! ☹\033[0m , Expected: ~s, Actual: ~s \n" staff-res my-res)) #f))
-			)))
+			))))
 			
 			
 (define runTests
