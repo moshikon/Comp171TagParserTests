@@ -30,7 +30,6 @@
 
 (define verify-equality
   (lambda (input staff-res my-res)
-    ;(display (format "\033[1;32m ~s \033[0m \n" (length (cddr my-res))))
     (and 
       (equal? (car staff-res) (car my-res))
       (equal? (length (cadr staff-res)) (length (cadr my-res)))
@@ -107,6 +106,8 @@
        (* a b c d)))
     '(((((((((((+ x 1)))))))))) ((((((((((+ x 1)))))))))))
     '((list (list + 2 1)) (list (list + 2 1)))
+    '(* (+ (1 (+ 2 (- 3 (+ 4 5))))) (+ (1 (+ 2 (- 3 (+ 4 5))))))
+    '(* (+ (1 (+ 2 (- 3 (+ 4 5))))) (+ (6 (+ 7 (- 8 (+ 4 5))))) (+ (9 (+ 10 (- 11 (+ 4 5))))) (+ (12 (+ 13 (- 14 (+ 4 5))))))
 ))
 
 (define mayerExamplesTests
