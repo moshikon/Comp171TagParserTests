@@ -35,7 +35,7 @@
       (equal? (car staff-res) (car my-res))
       (equal? (length (cadr staff-res)) (length (cadr my-res)))
       (equal? (length (cddr staff-res)) (length (cddr my-res)))
-      (equal? (eval-input staff-parse-func input) (eval-input my-parse-func input)))
+      (equal? (eval-input staff-parse-func input) (eval-input my-parse-func input)))      
 ))      
 
 (define testVSstaff
@@ -98,7 +98,15 @@
     '(foo (a) (a) (b) (b) (b) (b) (c) (c) (c))
     '(foo (a) (b) (c) (b) (c) (b) (c) (a))
     '(begin (define goo (a (b b) (b c) (b b) (b c) (b b) (b c))) (a b))
-    '(a (f (+ g h) 1 (g (+ g h) (+ g h)) 3 (g (+ g h) (+ g h)) (+ g h)))   
+    '(a (f (+ g h) 1 (g (+ g h) (+ g h)) 3 (g (+ g h) (+ g h)) (+ g h)))
+    '(+ '('(+ x 1)) (f x) (g x) (lambda (x) (f x)) '(+ x 1))
+    '(begin '(a b) '(a b))     
+    '((+ (+ (+ x 2) 1) (+ (+ x 2) 1) (+ (+ x 2) 1) (+ (+ x 2) 1))) 
+    '(let ((a (+ x 1)) (b (+ x 1)))
+      (let ((c (+ x 1)) (d (+ x 1)))
+       (* a b c d)))
+    '(((((((((((+ x 1)))))))))) ((((((((((+ x 1)))))))))))
+    '((list (list + 2 1)) (list (list + 2 1)))
 ))
 
 (define mayerExamplesTests
