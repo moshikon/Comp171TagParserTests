@@ -8,23 +8,22 @@
 
 (define replace-gensym
   (lambda (exp-lst)
-    (begin (gensym-count 0)
     (if (null? exp) '()
     (map (lambda (el) 
 	    (cond 	    
 	    ((gensym? el) (symbol->string el))
 	    ((not (pair? el)) el)
 	    ((list? el) (replace-gensym el))
-	    (else (append (replace-gensym (car exp-lst)) (replace-gensym (cdr exp-lst)))))) exp-lst)))
+	    (else (append (replace-gensym (car exp-lst)) (replace-gensym (cdr exp-lst)))))) exp-lst))
 ))
 
 (define testVSstaff
 	(lambda (input)
-		(let* ((my-res (replace-gensym (my-parse-func input)))
-		      (staff-res (replace-gensym (staff-parse-func input))))
+		(let* ((my-res (begin (gensym-count 0) (replace-gensym (my-parse-func input))))
+		      (staff-res (begin (gensym-count 0) (replace-gensym (staff-parse-func input)))))
 			(display (format "~s" input))
 			(display (format " => ~s\n" my-res))
-			(cond ((equal? (begin (gensym-count 0) staff-res) (begin (gensym-count 0) my-res))
+			(cond ((equal?  staff-res  my-res)
 				(display (format "\033[1;32m Success! ☺ \033[0m \n")) #t)
 				(else 
 				(display (format "\033[1;31m Failed! ☹\033[0m , Expected: ~s, Actual: ~s \n" staff-res my-res)) #f))
@@ -57,22 +56,16 @@
 ))
 
 (define mayerExamples
-  (list
-    '(+ 2 3)
-    ;'(f (f (f (f x))))
+  (list  
+'(+ 2 3)
+    '(f (f (f (f x))))
     '(* (+ 2 3 4) (+ 2 3 4))
     '(* (+ 2 (f 3 5) 4) (+ 2 (f 3 5) 4))
     '(f (g x y) (f (g x y) z))
-    
-;'(+ (* (- x y) (* x x))
-;(* x x)
-;(foo (- x y))
-;(goo (* (- x y) (* x x))))
-      
-;'(f (g x)
-;(g (g x))
-;(h (g (g x)) (g x))
-;((g x) (g x)))    
+    '(+ (* (- x y) (* x x)) (* x x) (foo (- x y)) (goo (* (- x y) (* x x))))
+    '(f (g x) (g (g x)) (h (g (g x)) (g x)) ((g x) (g x)))
+    '(list (cons 'a 'b) (cons 'a 'b) (list (cons 'a 'b) (cons 'a 'b)) (list (list (cons 'a 'b) (cons 'a 'b))))
+    '(list '(a b) (list '(a b) '(c d)) (list '(a b) '(c d)))
 
 ))
 
