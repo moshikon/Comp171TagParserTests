@@ -9,6 +9,7 @@
 (define a (lambda args 1))
 (define b (lambda args 2))
 (define c (lambda args 3))
+(define foo (lambda args 3))
 (define x 5)
 
 (define eval-input
@@ -27,13 +28,23 @@
 	    (else (append (replace-gensym (car exp-lst)) (replace-gensym (cdr exp-lst)))))) exp-lst))
 ))
 
+(define verify-equality
+  (lambda (input staff-res my-res)
+    ;(display (format "\033[1;32m ~s \033[0m \n" (length (cddr my-res))))
+    (and 
+      (equal? (car staff-res) (car my-res))
+      (equal? (length (cadr staff-res)) (length (cadr my-res)))
+      (equal? (length (cddr staff-res)) (length (cddr my-res)))
+      (equal? (eval-input staff-parse-func input) (eval-input my-parse-func input)))
+))      
+
 (define testVSstaff
 	(lambda (input)
 		(let* ((my-res (begin (gensym-count 0) (replace-gensym (my-parse-func input))))
 		      (staff-res (begin (gensym-count 0) (replace-gensym (staff-parse-func input)))))
 			(display (format "~s" input))
 			;(display (format "\n => ~s\n" my-res))
-			(cond ((or (equal? staff-res  my-res) (equal? (eval-input staff-parse-func input) (eval-input my-parse-func input)))
+			(cond ((or (equal? staff-res  my-res) (verify-equality input staff-res my-res))
 				(display (format "\033[1;32m Success! ☺ \033[0m \n")) #t)
 				(else 
 				(display (format "\033[1;31m Failed! ☹\033[0m , Expected: ~s, Actual: ~s \n" staff-res my-res)) #f))
@@ -67,26 +78,27 @@
 
 (define quotedListsTests
   (list 
-      '(append '(a b c d e) '(a b c d e) '(a b c d e) '(a b c d e) '(a b c d e))
+      '(append '(a b c d e) '(a b c d e) '(g f h) '(a b c d e) '(a b c d e) '(a b c d e) '(g f h))
       '(g (f '('(1 2 3 4 5 6 7 8 9 0) '(a b c d e)) (list f g h) '('(1 2 3 4 5 6 7 8 9 0) '(a b c d e))) (list f g h))
       '(list '(a b) (list '(a b) '(c d)) (list '(a b) '(c d)))
       '(+ '('(+ x 1)) (f x) (g x) (lambda (x) (f x)) '(+ x 1))
       '(begin '(a b) '(a b))       
 ))
 
-(define myTests
+(define otherTests
   (list
-     '(+ (+ 1 2 3) (+ 4 5 6) (+ 1 2 3) (+ 4 5 6))
+    '(* (+ 2 (f 3 5) 4) (+ 2 (f 3 5) 4))   
+    '(+ (+ 1 2 3) (+ 4 5 6) (+ 1 2 3) (+ 4 5 6))
     '((a 1) (b 2) (a 1) (b 2) (c 3) (c 3))
     '(f (c (a b)) (a b) (c (a b)))
     '(f (c (a b)) (a b) (c (a b)) (a b))    
     '(foo (a b b b b b b))
     '(foo ((a b) (b b) (b c) (b b) (b c) (b b) (b c)))
     '(begin (a) (a) (b) (b) (b) (c) (c) (c) (c))
-    ;'(foo ((a) (a) (b) (b) (b) (b) (c) (c) (c)))
-    ;'(foo ((a) (b) (c) (b) (c) (b) (c) (a)))
-    ;'(begin (define foo ((a b) (b b) (b c) (b b) (b c) (b b) (b c))) (a b))
-    ;'(a (f (+ g h) 1 (g (+ g h) (+ g h)) 3 (g (+ g h) (+ g h)) (+ g h)))   
+    '(foo (a) (a) (b) (b) (b) (b) (c) (c) (c))
+    '(foo (a) (b) (c) (b) (c) (b) (c) (a))
+    '(begin (define goo (a (b b) (b c) (b b) (b c) (b b) (b c))) (a b))
+    '(a (f (+ g h) 1 (g (+ g h) (+ g h)) 3 (g (+ g h) (+ g h)) (+ g h)))   
 ))
 
 (define mayerExamplesTests
@@ -94,13 +106,11 @@
     '(+ 2 3)
     '(f (f (f (f x))))
     '(* (+ 2 3 4) (+ 2 3 4))
-    '(* (+ 2 (f 3 5) 4) (+ 2 (f 3 5) 4))
-    ;'(f (g x y) (f (g x y) z))
-    ;'(+ (* (- x y) (* x x)) (* x x) (foo (- x y)) (goo (* (- x y) (* x x))))
-    ;'(f (g x) (g (g x)) (h (g (g x)) (g x)) ((g x) (g x)))
-    ;'(list (cons 'a 'b) (cons 'a 'b) (list (cons 'a 'b) (cons 'a 'b)) (list (list (cons 'a 'b) (cons 'a 'b))))
-    ;'(list '(a b) (list '(a b) '(c d)) (list '(a b) '(c d)))
-
+    '(f (g x y) (f (g x y) z))       
+    '(+ (* (- x y) (* x x)) (* x x) (foo (- x y)) (goo (* (- x y) (* x x))))
+    '(f (g x) (g (g x)) (h (g (g x)) (g x)) ((g x) (g x)))
+    '(list (cons 'a 'b) (cons 'a 'b) (list (cons 'a 'b) (cons 'a 'b)) (list (list (cons 'a 'b) (cons 'a 'b))))
+    '(list '(a b) (list '(a b) '(c d)) (list '(a b) '(c d)))
 ))
 
 (display (format "\033[1mComp171 - CSE Tests\033[0m\n====================\n"))
@@ -109,5 +119,5 @@
   (list
       (cons "Mayer Examples" mayerExamplesTests)     
       (cons "Quoted Lists" quotedListsTests)   
-      (cons "My Tests" myTests)       
+      (cons "My Tests" otherTests)       
 ))
