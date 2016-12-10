@@ -10,7 +10,7 @@
   (lambda (exp-lst)
     (if (null? exp) '()
     (map (lambda (el) 
-	    (cond 	    
+	    (cond 	    	    
 	    ((gensym? el) (symbol->string el))
 	    ((not (pair? el)) el)
 	    ((list? el) (replace-gensym el))
@@ -22,7 +22,7 @@
 		(let* ((my-res (begin (gensym-count 0) (replace-gensym (my-parse-func input))))
 		      (staff-res (begin (gensym-count 0) (replace-gensym (staff-parse-func input)))))
 			(display (format "~s" input))
-			(display (format " => ~s\n" my-res))
+			(display (format "\n => ~s\n" my-res))
 			(cond ((equal?  staff-res  my-res)
 				(display (format "\033[1;32m Success! ☺ \033[0m \n")) #t)
 				(else 
@@ -33,10 +33,10 @@
 (define runTests
   (lambda (tests-name lst)
 	(newline)
-	(display tests-name)
+	(display (format "\033[1m~s" tests-name))
 	(display ":")
 	(newline)
-	(display "================")
+	(display "================\033[0m")
 	(newline)
 	(let ((results (map testVSstaff lst)))
 	(newline)
@@ -55,9 +55,28 @@
 		(newline))
 ))
 
-(define mayerExamples
+(define quotedListsTests
+  (list 
+      '(+ '(a b c d e) '(a b c d e) '(a b c d e) '(a b c d e) '(a b c d e))
+      '(g (f '('(1 2 3 4 5 6 7 8 9 0) '(a b c d e)) (list f g h) '('(1 2 3 4 5 6 7 8 9 0) '(a b c d e))) (list f g h))
+))
+
+(define myTests
+  (list
+    '(f (c (a b)) (a b) (c (a b)))
+    '(f (c (a b)) (a b) (c (a b)) (a b))    
+    '(define foo (a b b b b b b))
+    '(define foo ((a b) (b b) (b c) (b b) (b c) (b b) (b c)))
+    ;'(foo ((a) (a) (b) (b) (b) (c) (c) (c)))
+    '(foo ((a) (a) (b) (b) (b) (b) (c) (c) (c)))
+    ;'(foo ((a) (b) (c) (b) (c) (b) (c) (a)))
+    ;'(begin (define foo ((a b) (b b) (b c) (b b) (b c) (b b) (b c))) (a b))
+    '(define a (f (+ g h) 1 (g (+ g h) (+ g h)) 3 (g (+ g h) (+ g h)) (+ g h)))
+))
+
+(define mayerExamplesTests
   (list  
-'(+ 2 3)
+    '(+ 2 3)
     '(f (f (f (f x))))
     '(* (+ 2 3 4) (+ 2 3 4))
     '(* (+ 2 (f 3 5) 4) (+ 2 (f 3 5) 4))
@@ -69,9 +88,11 @@
 
 ))
 
-(display (format "Comp171 - CSE Tests\n====================\n"))
+(display (format "\033[1mComp171 - CSE Tests\033[0m\n====================\n"))
 
 (runAllTests
   (list
-      (cons "Mayer Examples" mayerExamples)     
+      (cons "Mayer Examples" mayerExamplesTests)     
+      (cons "Quoted Lists" quotedListsTests)   
+      (cons "My Tests" myTests)       
 ))
