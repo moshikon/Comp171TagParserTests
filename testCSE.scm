@@ -6,6 +6,16 @@
 (define my-parse-func cse-2)
 (define staff-parse-func cse)
 
+(define a (lambda args 1))
+(define b (lambda args 2))
+(define c (lambda args 3))
+(define x 5)
+
+(define eval-input
+  (lambda (cse input)
+    (eval (cse input))
+))    
+
 (define replace-gensym
   (lambda (exp-lst)
     (if (null? exp) '()
@@ -22,8 +32,8 @@
 		(let* ((my-res (begin (gensym-count 0) (replace-gensym (my-parse-func input))))
 		      (staff-res (begin (gensym-count 0) (replace-gensym (staff-parse-func input)))))
 			(display (format "~s" input))
-			(display (format "\n => ~s\n" my-res))
-			(cond ((equal?  staff-res  my-res)
+			;(display (format "\n => ~s\n" my-res))
+			(cond ((or (equal? staff-res  my-res) (equal? (eval-input staff-parse-func input) (eval-input my-parse-func input)))
 				(display (format "\033[1;32m Success! ☺ \033[0m \n")) #t)
 				(else 
 				(display (format "\033[1;31m Failed! ☹\033[0m , Expected: ~s, Actual: ~s \n" staff-res my-res)) #f))
@@ -57,21 +67,26 @@
 
 (define quotedListsTests
   (list 
-      '(+ '(a b c d e) '(a b c d e) '(a b c d e) '(a b c d e) '(a b c d e))
+      '(append '(a b c d e) '(a b c d e) '(a b c d e) '(a b c d e) '(a b c d e))
       '(g (f '('(1 2 3 4 5 6 7 8 9 0) '(a b c d e)) (list f g h) '('(1 2 3 4 5 6 7 8 9 0) '(a b c d e))) (list f g h))
+      '(list '(a b) (list '(a b) '(c d)) (list '(a b) '(c d)))
+      '(+ '('(+ x 1)) (f x) (g x) (lambda (x) (f x)) '(+ x 1))
+      '(begin '(a b) '(a b))       
 ))
 
 (define myTests
   (list
+     '(+ (+ 1 2 3) (+ 4 5 6) (+ 1 2 3) (+ 4 5 6))
+    '((a 1) (b 2) (a 1) (b 2) (c 3) (c 3))
     '(f (c (a b)) (a b) (c (a b)))
     '(f (c (a b)) (a b) (c (a b)) (a b))    
-    '(define foo (a b b b b b b))
-    '(define foo ((a b) (b b) (b c) (b b) (b c) (b b) (b c)))
-    ;'(foo ((a) (a) (b) (b) (b) (c) (c) (c)))
-    '(foo ((a) (a) (b) (b) (b) (b) (c) (c) (c)))
+    '(foo (a b b b b b b))
+    '(foo ((a b) (b b) (b c) (b b) (b c) (b b) (b c)))
+    '(begin (a) (a) (b) (b) (b) (c) (c) (c) (c))
+    ;'(foo ((a) (a) (b) (b) (b) (b) (c) (c) (c)))
     ;'(foo ((a) (b) (c) (b) (c) (b) (c) (a)))
     ;'(begin (define foo ((a b) (b b) (b c) (b b) (b c) (b b) (b c))) (a b))
-    '(define a (f (+ g h) 1 (g (+ g h) (+ g h)) 3 (g (+ g h) (+ g h)) (+ g h)))
+    ;'(a (f (+ g h) 1 (g (+ g h) (+ g h)) 3 (g (+ g h) (+ g h)) (+ g h)))   
 ))
 
 (define mayerExamplesTests
@@ -80,11 +95,11 @@
     '(f (f (f (f x))))
     '(* (+ 2 3 4) (+ 2 3 4))
     '(* (+ 2 (f 3 5) 4) (+ 2 (f 3 5) 4))
-    '(f (g x y) (f (g x y) z))
-    '(+ (* (- x y) (* x x)) (* x x) (foo (- x y)) (goo (* (- x y) (* x x))))
-    '(f (g x) (g (g x)) (h (g (g x)) (g x)) ((g x) (g x)))
-    '(list (cons 'a 'b) (cons 'a 'b) (list (cons 'a 'b) (cons 'a 'b)) (list (list (cons 'a 'b) (cons 'a 'b))))
-    '(list '(a b) (list '(a b) '(c d)) (list '(a b) '(c d)))
+    ;'(f (g x y) (f (g x y) z))
+    ;'(+ (* (- x y) (* x x)) (* x x) (foo (- x y)) (goo (* (- x y) (* x x))))
+    ;'(f (g x) (g (g x)) (h (g (g x)) (g x)) ((g x) (g x)))
+    ;'(list (cons 'a 'b) (cons 'a 'b) (list (cons 'a 'b) (cons 'a 'b)) (list (list (cons 'a 'b) (cons 'a 'b))))
+    ;'(list '(a b) (list '(a b) '(c d)) (list '(a b) '(c d)))
 
 ))
 
