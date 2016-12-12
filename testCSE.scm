@@ -6,6 +6,11 @@
 (define my-parse-func cse-2)
 (define staff-parse-func cse)
 
+(define try-catch
+  (lambda (try-thunk catch-thunk)
+    (guard (c (else (catch-thunk)))
+     (try-thunk))))
+
 (define a (lambda args 1))
 (define b (lambda args 2))
 (define c (lambda args 3))
@@ -14,13 +19,14 @@
 (define f (lambda args 5))
 (define g (lambda args (lambda args 6)))
 (define h (lambda args 7))
+(define func (lambda args (lambds args func)))
 (define x 5)
 (define y 12)
 (define z 18)
 
 (define eval-input
   (lambda (cse input)
-    (eval (cse input))
+     (eval (cse input))
 ))    
 
 (define replace-gensym
@@ -36,11 +42,11 @@
 
 (define verify-equality
   (lambda (input staff-res my-res)
-    (and 
-      (equal? (car staff-res) (car my-res))
-      (equal? (length (cadr staff-res)) (length (cadr my-res)))
-      (equal? (length (cddr staff-res)) (length (cddr my-res)))
-      (equal? (eval-input staff-parse-func input) (eval-input my-parse-func input)))      
+      (and 
+	(equal? (car staff-res) (car my-res))
+	(equal? (length (cadr staff-res)) (length (cadr my-res)))
+	(equal? (length (cddr staff-res)) (length (cddr my-res)))
+	(equal? (eval-input staff-parse-func input) (eval-input my-parse-func input)))  
 ))      
 
 (define testVSstaff
@@ -49,10 +55,13 @@
 		(let* ((my-res (begin (gensym-count 0) (replace-gensym (my-parse-func input))))
 		      (staff-res (begin (gensym-count 0) (replace-gensym (staff-parse-func input)))))			
 			;(display (format "\n => ~s\n" my-res))
-			(cond ((or (equal? staff-res my-res) (verify-equality input staff-res my-res))
-				(display (format "\033[1;32m Success! ☺ \033[0m \n")) #t)
-				(else 
-				(display (format "\033[1;31m Failed! ☹\033[0m , Expected: ~s, Actual: ~s \n" staff-res my-res)) #f))
+			(try-catch
+			  (lambda ()
+			    (cond ((or (equal? staff-res my-res) (verify-equality input staff-res my-res))
+				    (display (format "\033[1;32m Success! ☺ \033[0m \n")) #t)
+				    (else 
+				    (display (format "\033[1;31m Failed! ☹\033[0m , Expected: ~s, Actual: ~s \n" staff-res my-res)) #f)))
+			  (lambda () (display (format "\n\033[1;34mUNABLE TO DETERMINE SUCESS/FAILURE!\nPLEASE CHECK MANUALLY THE INPUT: ~s\033[0m\n" input)) #f))
 			))))
 			
 			
@@ -104,13 +113,13 @@
     '(foo (a) (b) (c) (b) (c) (b) (c) (a))
     '(begin (define goo (a (b b) (b c) (b b) (b c) (b b) (b c))) (a b))
     '(a (f (+ g h) 1 (g (+ g h) (+ g h)) 3 (g (+ g h) (+ g h)) (+ g h)))
-    '(f '('(+ x 1)) (f x) (g x) (lambda (x) (f x)) '(+ x 1))
+    '(f '('(+ x 1)) (f x) (g x) (f (f x)) '(+ x 1))
     '(begin '(a b) '(a b))     
     '(+ (+ (+ x 2) 1) (+ (+ x 2) 1) (+ (+ x 2) 1) (+ (+ x 2) 1)) 
     '(let ((a (+ x 1)) (b (+ x 1)))
       (let ((c (+ x 1)) (d (+ x 1)))
        (* a b c d)))
-    '(((((((((((+ x 1)))))))))) ((((((((((+ x 1)))))))))))
+    '(((((((((((func x 1)))))))))) ((((((((((func x 1)))))))))))
     '(list (list (list + 2 1)) (list (list + 2 1)))
     '(* (+ (+ 1 (+ 2 (- 3 (+ 4 5))))) (+ (+ 1 (+ 2 (- 3 (+ 4 5))))))
     '(* (+ (* 1 (+ 2 (- 3 (+ 4 5))))) (+ (* 6 (+ 7 (- 8 (+ 4 5))))) (+ (* 9 (+ 10 (- 11 (+ 4 5))))) (+ (* 12 (+ 13 (- 14 (+ 4 5))))))
