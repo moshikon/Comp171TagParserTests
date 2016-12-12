@@ -46,24 +46,39 @@
 	    (else (append (replace-gensym (car exp-lst)) (replace-gensym (cdr exp-lst)))))) exp-lst))
 ))
 
+(define replace-gensym-to-string
+  (lambda (exp-lst)
+    (if (null? exp) '()
+    (map (lambda (el) 
+	    (cond 	    	    
+	    ((gensym? el) "g")
+	    ((not (pair? el)) el)
+	    ((list? el) (replace-gensym-to-string el))
+	    (else (append (replace-gensym-to-string (car exp-lst)) (replace-gensym-to-string (cdr exp-lst)))))) exp-lst))
+))
+
 (define verify-equality
-  (lambda (input staff-res my-res)
+  (lambda (input)      
+      (let* ((my-res-with-str (begin (gensym-count 0) (replace-gensym-to-string (my-parse-func input))))
+	     (staff-res-with-str (begin (gensym-count 0) (replace-gensym-to-string (staff-parse-func input)))))
       (and 
-	(equal? (car staff-res) (car my-res))
-	(equal? (length (cadr staff-res)) (length (cadr my-res)))
-	(equal? (length (cddr staff-res)) (length (cddr my-res)))
-	(equal? (eval-input staff-parse-func input) (eval-input my-parse-func input)))  
-))      
+	(equal? (car staff-res-with-str) (car my-res-with-str))
+	(equal? (length (cadr staff-res-with-str)) (length (cadr my-res-with-str)))
+	(equal? (length (cddr staff-res-with-str)) (length (cddr my-res-with-str)))
+	(if (and (list? staff-res-with-str) (or (equal? (car staff-res-with-str) 'let) (equal? (car staff-res-with-str) 'let*)))
+		(equal? (cddr my-res-with-str) (cddr staff-res-with-str)) #t)
+	(equal? (eval-input staff-parse-func input) (eval-input my-parse-func input))))
+))    
 
 (define testVSstaff
 	(lambda (input)
 		(begin (display input)
 		(let* ((my-res (begin (gensym-count 0) (replace-gensym (my-parse-func input))))
 		      (staff-res (begin (gensym-count 0) (replace-gensym (staff-parse-func input)))))			
-			;(display (format "\n => ~s\n" my-res))
+			(display (format "\n => ~s\n" my-res))
 			(try-catch
 			  (lambda ()
-			    (cond ((or (equal? staff-res my-res) (verify-equality input staff-res my-res))
+			    (cond ((or (equal? staff-res my-res) (verify-equality input))
 				    (display (format "\033[1;32m Success! ☺ \033[0m \n")) #t)
 				    (else 
 				    (display (format "\033[1;31m Failed! ☹\033[0m , Expected: ~s, Actual: ~s \n" staff-res my-res)) #f)))
