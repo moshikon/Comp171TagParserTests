@@ -1,3 +1,9 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;; Comp171 - ASS2 - CSE - Tests
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (print-gensym #f)
 ; Change to your own location
 (load "~/compilation/ass2/cse.scm")
@@ -19,7 +25,7 @@
 (define f (lambda args 5))
 (define g (lambda args (lambda args 6)))
 (define h (lambda args 7))
-(define func (lambda args (lambds args func)))
+(define func (lambda args (lambda args func)))
 (define x 5)
 (define y 12)
 (define z 18)
@@ -95,7 +101,7 @@
       '(append '(a b c d e) '(a b c d e) '(g f h) '(a b c d e) '(a b c d e) '(a b c d e) '(g f h))
       '(g (f '('(1 2 3 4 5 6 7 8 9 0) '(a b c d e)) (list f g h) '('(1 2 3 4 5 6 7 8 9 0) '(a b c d e))) (list f g h))
       '(list '(a b) (list '(a b) '(c d)) (list '(a b) '(c d)))
-      '(f (+ x 1) (f x) (g x) (lambda (x) (f x)) (+ x 1))
+      '(f (+ x 1) (f x) (g x) (f (f x)) (+ x 1))
       '(begin '(a b) '(a b))       
 ))
 

@@ -1,3 +1,9 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;; Comp171 - ASS2 - Part 1 - Tests
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; Change to your own location
 (load "~/compilation/ass2/compiler.scm")
 (load "~/compilation/ass2/tagparser.so")
@@ -28,7 +34,7 @@
 	(display tests-name)
 	(display ":")
 	(newline)
-	(display "=============")
+	(display "==============================================")
 	(newline)
 	(let ((results (map testVSstaff lst)))
 	(newline)
@@ -364,6 +370,8 @@
     
     
 ))
+
+(display (format "\033[1mComp171 - Part 1 Tests\033[0m\n================================\n"))
 
 (runAllTests
   (list
