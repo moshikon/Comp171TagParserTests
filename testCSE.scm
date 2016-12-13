@@ -57,16 +57,25 @@
 	    (else (append (replace-gensym-to-string (car exp-lst)) (replace-gensym-to-string (cdr exp-lst)))))) exp-lst))
 ))
 
+(define equal-let-vars?
+  (lambda (staff-res my-res)
+    (let ((staff-vars (map cadr (cadr staff-res)))
+	  (my-vars (map cadr (cadr my-res))))
+	  (andmap (lambda (x) (member x staff-vars)) my-vars))
+
+))	  
+
 (define verify-equality
   (lambda (input)      
       (let* ((my-res-with-str (begin (gensym-count 0) (replace-gensym-to-string (my-parse-func input))))
-	     (staff-res-with-str (begin (gensym-count 0) (replace-gensym-to-string (staff-parse-func input)))))
+	     (staff-res-with-str (begin (gensym-count 0) (replace-gensym-to-string (staff-parse-func input)))))	     
       (and 
 	(equal? (car staff-res-with-str) (car my-res-with-str))
 	(equal? (length (cadr staff-res-with-str)) (length (cadr my-res-with-str)))
 	(equal? (length (cddr staff-res-with-str)) (length (cddr my-res-with-str)))
 	(if (and (list? staff-res-with-str) (or (equal? (car staff-res-with-str) 'let) (equal? (car staff-res-with-str) 'let*)))
-		(equal? (cddr my-res-with-str) (cddr staff-res-with-str)) #t)
+		(and (equal? (cddr my-res-with-str) (cddr staff-res-with-str)) 
+		     (equal-let-vars? my-res-with-str staff-res-with-str)) #t)
 	(equal? (eval-input staff-parse-func input) (eval-input my-parse-func input))))
 ))    
 
